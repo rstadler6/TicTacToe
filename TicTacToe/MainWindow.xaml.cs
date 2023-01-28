@@ -38,6 +38,9 @@ namespace TicTacToe
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if (!player1Turn)
+                return;
+
             Button button = (Button)sender;
             int row = Grid.GetRow(button);
             int col = Grid.GetColumn(button);
@@ -48,18 +51,8 @@ namespace TicTacToe
                 return;
             }
 
-            if (player1Turn)
-            {
-                button.Content = "X";
-                board[row, col] = "X";
-                player1Turn = false;
-            }
-            else
-            {
-                button.Content = "O";
-                board[row, col] = "O";
-                player1Turn = true;
-            }
+            button.Content = "X";
+            player1Turn = false;
 
             if (IsWin())
             {
@@ -153,6 +146,25 @@ namespace TicTacToe
             gameState.TrimEnd(',');
             return gameState;
         }
+
+        private void SetGameState(string gameState)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    board[i, j].Content = gameState[i * 3 + j];
+                }
+            }
+
+            player1Turn = true;
+        }
+
+        private void SendToAI()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
+            request.Content = new StringContent(ConvertGameState());
+            client.Send(request);
         }
     }
 }
