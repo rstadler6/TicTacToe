@@ -5,9 +5,7 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicTacToe", "TicTacToe\TicTacToe.csproj", "{72C3C461-1C6D-4499-820A-84D40985E74B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToeApi", "TicTacToeApi\TicTacToeApi.csproj", "{03AC2C62-9FF9-466C-8355-2AAD03D5238C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicTacToeService", "TicTacToeService\TicTacToeService.csproj", "{1F4F1890-F802-4142-A101-8C214274A08C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicTacToeApi", "TicTacToeApi\TicTacToeApi.csproj", "{03AC2C62-9FF9-466C-8355-2AAD03D5238C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{03AC2C62-9FF9-466C-8355-2AAD03D5238C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03AC2C62-9FF9-466C-8355-2AAD03D5238C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03AC2C62-9FF9-466C-8355-2AAD03D5238C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F4F1890-F802-4142-A101-8C214274A08C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F4F1890-F802-4142-A101-8C214274A08C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F4F1890-F802-4142-A101-8C214274A08C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F4F1890-F802-4142-A101-8C214274A08C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

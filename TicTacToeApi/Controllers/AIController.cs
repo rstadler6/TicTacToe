@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using TicTacToeService;
 
 namespace TicTacToeApi.Controllers
 {
@@ -15,9 +14,18 @@ namespace TicTacToeApi.Controllers
         }
 
         [HttpPost(Name = "MakeMove")]
-        public void MakeMove([FromBody]int field)
+        public void MakeMove([FromBody] MoveResponse move)
         {
-            //TicTacToeService.TicTacToeService.MakeMove(field);
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\TicTacToe\\Moves\\" + move.Move;
+            var file = System.IO.File.CreateText(path);
+            file.Write(move.Field);
+            file.Close();
         }
+    }
+
+    public class MoveResponse
+    {
+        public int Field { get; set; }
+        public int Move { get; set; }
     }
 }

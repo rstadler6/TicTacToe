@@ -1,14 +1,14 @@
 ﻿using System;
 using System.CodeDom;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
-using TicTacToeService;
-
 namespace TicTacToe
 {
     public partial class MainWindow : Window
@@ -17,11 +17,12 @@ namespace TicTacToe
         private readonly Button[,] board;
         private readonly HttpClient client = new();
         private bool player1Turn = true;
+        private int aiMove = 1;
 
         public MainWindow()
         {
             InitializeComponent();
-            TicTacToeService.TicTacToeService.RegisterMakeMoveAction(MakeMove);
+            TicTacToeService.RegisterMakeMoveAction(MakeMove);
 
             board = new [,]
             {
@@ -30,13 +31,7 @@ namespace TicTacToe
                 {button7, button8, button9}
             };
 
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    board[i, j].Content = "";
-                }
-            }
+            ResetGame();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -54,8 +49,15 @@ namespace TicTacToe
                 return;
             }
 
-            button.Content = "X";
-            player1Turn = false;
+            button.Content = "O";
+
+            FinishTurn();
+            SendToAI();
+        }
+
+        private void FinishTurn()
+        {
+            player1Turn = !player1Turn;
 
             if (IsWin())
             {
@@ -67,8 +69,6 @@ namespace TicTacToe
                 MessageBox.Show("It's a draw!");
                 ResetGame();
             }
-
-            SendToAI();
         }
 
         private bool IsWin()
@@ -132,6 +132,8 @@ namespace TicTacToe
             }
 
             player1Turn = true;
+            aiMove = 1;
+            TicTacToeService.InitMoves();
         }
 
         private string ConvertGameState()
@@ -168,12 +170,23 @@ namespace TicTacToe
             var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
             request.Content = new StringContent(ConvertGameState());
             client.Send(request);
+            Task.Run(() => TicTacToeService.StartLoop(aiMove++));
+
+
+            /*Task.Factory.StartNew(() =>
+            {
+                TicTacToeService.StartLoop(aiMove++);
+            });*/
         }
 
         private void MakeMove(int field)
         {
-            board[(field - 1) / 3, (field - 1) % 3].Content = "X";
-            player1Turn = true;
+            Dispatcher.Invoke(() =>
+            {
+                board[(field - 1) / 3, (field - 1) % 3].Content = "X";
+            });
+
+            FinishTurn();
         }
     }
 }
