@@ -4,7 +4,7 @@
     <decisionTable id="DecisionTable_17vnzvj">
       <input id="Input_1" label="Random Int">
         <inputExpression id="InputExpression_1" typeRef="string">
-          <text>field</text>
+          <text>randomInt</text>
         </inputExpression>
       </input>
       <output id="Output_1" label="Field" name="field" typeRef="string" biodi:width="192" />
