@@ -88,9 +88,11 @@ const winCombos = [
     [2, 5, 8],
     [0, 4, 8],
     [6, 4, 2]
-]
+];
 
-function bestSpot();
+var response = (function() {
+    return bestSpot();
+})();  
 
 function checkWin(board, player) {
     let plays = board.reduce((a, e, i) =&gt;
