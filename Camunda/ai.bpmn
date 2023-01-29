@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_01gw014" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.7.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.18.0">
   <bpmn:collaboration id="Collaboration_079bhlj">
-    <bpmn:participant id="Participant_16ce314" name="Tic Tac Toe AI" processRef="Process_0lg95ze" />
+    <bpmn:participant id="Participant_16ce314" name="Tic Tac Toe AI" processRef="TicTacToe" />
   </bpmn:collaboration>
-  <bpmn:process id="Process_0lg95ze" isExecutable="true">
+  <bpmn:process id="TicTacToe" isExecutable="true">
     <bpmn:laneSet id="LaneSet_1p2la25">
       <bpmn:lane id="Lane_0hgyvjs" name="Player">
         <bpmn:flowNodeRef>Activity_0ca8v0m</bpmn:flowNodeRef>
@@ -58,13 +58,11 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="payload">${field}</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:8080/update</camunda:inputParameter>
-            <camunda:inputParameter name="headers">
-              <camunda:map>
-                <camunda:entry key="Content-Type">application/json</camunda:entry>
-              </camunda:map>
-            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">{
+  "field": ${field},
+  "move": ${move}
+}</camunda:inputParameter>
+            <camunda:inputParameter name="url">https://localhost:7002/AI</camunda:inputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
@@ -195,12 +193,12 @@ function minimax(newBoard, player) {
         <dc:Bounds x="129" y="80" width="1121" height="500" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_0hgyvjs_di" bpmnElement="Lane_0hgyvjs" isHorizontal="true">
-        <dc:Bounds x="159" y="350" width="1091" height="230" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_1czsko7_di" bpmnElement="Lane_1czsko7" isHorizontal="true">
         <dc:Bounds x="159" y="80" width="1091" height="270" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0hgyvjs_di" bpmnElement="Lane_0hgyvjs" isHorizontal="true">
+        <dc:Bounds x="159" y="350" width="1091" height="230" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_10gczwe_di" bpmnElement="Activity_0ca8v0m">
