@@ -63,6 +63,11 @@
   "move": ${move}
 }</camunda:inputParameter>
             <camunda:inputParameter name="url">https://localhost:7002/AI</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
