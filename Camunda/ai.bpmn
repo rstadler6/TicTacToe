@@ -127,7 +127,93 @@
     <bpmn:scriptTask id="Activity_06bzww7" name="check for strat">
       <bpmn:incoming>Flow_1wxdh24</bpmn:incoming>
       <bpmn:outgoing>Flow_1m055lt</bpmn:outgoing>
-      <bpmn:script></bpmn:script>
+      <bpmn:script>var fieldState = execution.getVariable('fields')
+const huPlayer = 'O';
+const aiPlayer = 'X';
+const winCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [6, 4, 2]
+]
+
+function bestSpot();
+
+function checkWin(board, player) {
+    let plays = board.reduce((a, e, i) =&gt;
+        (e === player) ? a.concat(i) : a, []);
+    let gameWon = null;
+    for (let [index, win] of winCombos.entries()) {
+        if (win.every(elem =&gt; plays.indexOf(elem) &gt; -1)) {
+            gameWon = { index: index, player: player };
+            break;
+        }
+    }
+    return gameWon;
+}
+
+function emptySquares() {
+    return fieldState.filter(s =&gt; s == '_');
+}
+
+function bestSpot() {
+    return minimax(fieldState, aiPlayer).index;
+}
+
+function minimax(newBoard, player) {
+    var availSpots = emptySquares();
+
+    if (checkWin(newBoard, huPlayer)) {
+        return { score: -10 };
+    } else if (checkWin(newBoard, aiPlayer)) {
+        return { score: 10 };
+    } else if (availSpots.length === 0) {
+        return { score: 0 };
+    }
+    var moves = [];
+    for (var i = 0; i &lt; availSpots.length; i++) {
+        var move = {};
+        move.index = newBoard[availSpots[i]];
+        newBoard[availSpots[i]] = player;
+
+        if (player == aiPlayer) {
+            var result = minimax(newBoard, huPlayer);
+            move.score = result.score;
+        } else {
+            var result = minimax(newBoard, aiPlayer);
+            move.score = result.score;
+        }
+
+        newBoard[availSpots[i]] = move.index;
+
+        moves.push(move);
+    }
+
+    var bestMove;
+    if (player === aiPlayer) {
+        var bestScore = -10000;
+        for (var i = 0; i &lt; moves.length; i++) {
+            if (moves[i].score &gt; bestScore) {
+                bestScore = moves[i].score;
+                bestMove = i;
+            }
+        }
+    } else {
+        var bestScore = 10000;
+        for (var i = 0; i &lt; moves.length; i++) {
+            if (moves[i].score &lt; bestScore) {
+                bestScore = moves[i].score;
+                bestMove = i;
+            }
+        }
+    }
+
+    return moves[bestMove];
+}</bpmn:script>
     </bpmn:scriptTask>
   </bpmn:process>
   <bpmn:message id="Message_3if65mr" name="Message_3if65mr" />
@@ -137,12 +223,12 @@
         <dc:Bounds x="129" y="80" width="1121" height="770" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_1czsko7_di" bpmnElement="Lane_1czsko7" isHorizontal="true">
-        <dc:Bounds x="159" y="80" width="1091" height="500" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_0hgyvjs_di" bpmnElement="Lane_0hgyvjs" isHorizontal="true">
         <dc:Bounds x="159" y="580" width="1091" height="270" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1czsko7_di" bpmnElement="Lane_1czsko7" isHorizontal="true">
+        <dc:Bounds x="159" y="80" width="1091" height="500" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0n4no3t_di" bpmnElement="Gateway_0n4no3t" isMarkerVisible="true">
