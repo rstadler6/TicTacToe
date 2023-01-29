@@ -1,14 +1,6 @@
 ﻿using System;
-using System.CodeDom;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +10,7 @@ namespace TicTacToe
 {
     public partial class MainWindow : Window
     {
-        private const string definition = "Process_0lg95ze:1:1141e060-a024-11ed-bf23-eeb27378f622";
+        private const string definition = "TicTacToe:1:022792bd-a027-11ed-abb8-eeb27378f622";
 
         private readonly Button[,] board;
         private readonly HttpClient client = new();
