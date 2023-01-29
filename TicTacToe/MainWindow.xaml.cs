@@ -56,8 +56,8 @@ namespace TicTacToe
 
             button.Content = "O";
 
-            FinishTurn();
             SendToAI();
+            FinishTurn();
         }
 
         private void FinishTurn()
@@ -136,9 +136,20 @@ namespace TicTacToe
                 }
             }
 
-            player1Turn = true;
             aiMove = 1;
             TicTacToeService.InitMoves();
+            var startSelection = new StartSelection();
+
+            if (startSelection.ShowDialog() == false)
+            {
+                SendStartingPlayer("computer");
+                player1Turn = false;
+            }
+            else
+            {
+                SendStartingPlayer("player");
+                player1Turn = true;
+            }
         }
 
         private string ConvertGameState()
@@ -157,17 +168,18 @@ namespace TicTacToe
             return gameState;
         }
 
-        private void SetGameState(string gameState)
+        private void StartBackend()
         {
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    board[i, j].Content = gameState[i * 3 + j];
-                }
-            }
+            
+        }
 
-            player1Turn = true;
+        private void SendStartingPlayer(string player)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
+            request.Content = new StringContent(player);
+            client.Send(request);
+
+            Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
 
         private void SendToAI()
@@ -182,12 +194,6 @@ namespace TicTacToe
             client.Send(request);
 
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
-
-
-            /*Task.Factory.StartNew(() =>
-            {
-                TicTacToeService.StartLoop(aiMove++);
-            });*/
         }
 
         private void MakeMove(int field)
@@ -195,9 +201,8 @@ namespace TicTacToe
             Dispatcher.Invoke(() =>
             {
                 board[(field - 1) / 3, (field - 1) % 3].Content = "X";
+                FinishTurn();
             });
-
-            FinishTurn();
         }
 
     }

@@ -26,6 +26,7 @@ namespace TicTacToe
                 }
                 
                 makeMoveAction?.Invoke(int.Parse(File.ReadAllText(path)));
+                break;
             }
         }
 
