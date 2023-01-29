@@ -138,8 +138,9 @@ namespace TicTacToe
 
             aiMove = 1;
             TicTacToeService.InitMoves();
+            StartBackend();
+            
             var startSelection = new StartSelection();
-
             if (startSelection.ShowDialog() == false)
             {
                 SendStartingPlayer("computer");
@@ -170,28 +171,52 @@ namespace TicTacToe
 
         private void StartBackend()
         {
-            
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/process-definition/key/ai/start");
+            client.Send(request);
         }
 
-        private void SendStartingPlayer(string player)
+        private async void SendStartingPlayer(string player)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
-            request.Content = new StringContent(player);
-            client.Send(request);
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, "http://localhost:8080/engine-rest/task?processDefinitionKey=ai");
+            var content = (await client.SendAsync(getTasksRequest)).Content;
+            var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
 
-            Task.Run(() => TicTacToeService.StartLoop(aiMove++));
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
+            var json =
+                $@"
+{{
+  'variables': {{
+            'beginner': {{
+                'value': {player}
+            }}
+        }},
+        'withVariablesInReturn': false
+}}
+";
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            await client.SendAsync(request);
         }
 
-        private void SendToAI()
+        private async void SendToAI()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
-            var fieldState = new FieldState()
-            {
-                fields = ConvertGameState().ToCharArray()
-            };
-            var body = JsonConvert.SerializeObject(fieldState);
-            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
-            client.Send(request);
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, "http://localhost:8080/engine-rest/task?processDefinitionKey=ai");
+            var content = (await client.SendAsync(getTasksRequest)).Content;
+            var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
+
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
+            var json =
+                $@"
+{{
+  'variables': {{
+            'fields': {{
+                'value': {ConvertGameState().ToCharArray()}
+            }}
+        }},
+        'withVariablesInReturn': false
+}}
+";
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            await client.SendAsync(request);
 
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
@@ -207,8 +232,13 @@ namespace TicTacToe
 
     }
 
-    class FieldState
+    class FieldStateTask
     {
         public char[] fields { get; set; }
+    }
+
+    class TaskResponse
+    {
+        public string id { get; set; }
     }
 }
