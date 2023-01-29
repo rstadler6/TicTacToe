@@ -48,7 +48,7 @@ namespace TicTacToe
             int row = Grid.GetRow(button);
             int col = Grid.GetColumn(button);
             
-            if ((string)button.Content != "")
+            if ((string)button.Content != string.Empty)
             {
                 MessageBox.Show("This cell is already occupied!");
                 return;
@@ -81,7 +81,7 @@ namespace TicTacToe
             // Check rows
             for (int i = 0; i < 3; i++)
             {
-                if (board[i, 0].Content == board[i, 1].Content && board[i, 1].Content == board[i, 2].Content && (string)board[i, 0].Content != "")
+                if (board[i, 0].Content == board[i, 1].Content && board[i, 1].Content == board[i, 2].Content && (string)board[i, 0].Content != string.Empty)
                 {
                     return true;
                 }
@@ -90,19 +90,19 @@ namespace TicTacToe
             // Check columns
             for (int i = 0; i < 3; i++)
             {
-                if (board[0, i].Content == board[1, i].Content && board[1, i].Content == board[2, i].Content && (string)board[0, i].Content != "")
+                if (board[0, i].Content == board[1, i].Content && board[1, i].Content == board[2, i].Content && (string)board[0, i].Content != string.Empty)
                 {
                     return true;
                 }
             }
 
             // Check diagonals
-            if (board[0, 0].Content == board[1, 1].Content && board[1, 1].Content == board[2, 2].Content && (string)board[0, 0].Content != "")
+            if (board[0, 0].Content == board[1, 1].Content && board[1, 1].Content == board[2, 2].Content && (string)board[0, 0].Content != string.Empty)
             {
                 return true;
             }
 
-            if (board[0, 2].Content == board[1, 1].Content && board[1, 1].Content == board[2, 0].Content && (string)board[0, 2].Content != "")
+            if (board[0, 2].Content == board[1, 1].Content && board[1, 1].Content == board[2, 0].Content && (string)board[0, 2].Content != string.Empty)
             {
                 return true;
             }
@@ -116,7 +116,7 @@ namespace TicTacToe
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if ((string)board[i, j].Content == "")
+                    if ((string)board[i, j].Content == string.Empty)
                     {
                         return false;
                     }
@@ -132,14 +132,15 @@ namespace TicTacToe
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    board[i, j].Content = "";
+                    board[i, j].Content = string.Empty;
                 }
             }
 
             aiMove = 1;
             TicTacToeService.InitMoves();
+            StartBackend();
+            
             var startSelection = new StartSelection();
-
             if (startSelection.ShowDialog() == false)
             {
                 SendStartingPlayer("computer");
@@ -160,7 +161,8 @@ namespace TicTacToe
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    gameState += $"{board[i, j].Content},";
+                    var value = (string)board[i, j].Content != string.Empty ? board[i, j].Content : "_";
+                    gameState += $"{value},";
                 }
             }
 
@@ -170,28 +172,59 @@ namespace TicTacToe
 
         private void StartBackend()
         {
-            
+            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/process-definition/key/ai/start");
+            client.Send(request);
         }
 
-        private void SendStartingPlayer(string player)
+        private async void SendStartingPlayer(string player)
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
-            request.Content = new StringContent(player);
-            client.Send(request);
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, "http://localhost:8080/engine-rest/task?processDefinitionKey=ai");
+            var content = (await client.SendAsync(getTasksRequest)).Content;
+            var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
 
-            Task.Run(() => TicTacToeService.StartLoop(aiMove++));
+            var rand = new Random();
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
+            var json =
+                $@"
+{{
+  'variables': {{
+            'beginner': {{
+                'value': {player}
+            }},
+            'random': {{
+                'value': {rand.Next(1, 5)}
+            }}
+        }},
+        'withVariablesInReturn': false
+}}
+";
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            await client.SendAsync(request);
         }
 
-        private void SendToAI()
+        private async void SendToAI()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
-            var fieldState = new FieldState()
-            {
-                fields = ConvertGameState().ToCharArray()
-            };
-            var body = JsonConvert.SerializeObject(fieldState);
-            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
-            client.Send(request);
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, "http://localhost:8080/engine-rest/task?processDefinitionKey=ai");
+            var content = (await client.SendAsync(getTasksRequest)).Content;
+            var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
+
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
+            var json =
+                $@"
+{{
+  'variables': {{
+            'fields': {{
+                'value': {ConvertGameState().ToCharArray()}
+            }}
+            'move': {{
+                'value': {aiMove}
+            }}
+        }},
+        'withVariablesInReturn': false
+}}
+";
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            await client.SendAsync(request);
 
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
@@ -207,8 +240,13 @@ namespace TicTacToe
 
     }
 
-    class FieldState
+    class FieldStateTask
     {
         public char[] fields { get; set; }
+    }
+
+    class TaskResponse
+    {
+        public string id { get; set; }
     }
 }

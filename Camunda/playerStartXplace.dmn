@@ -4,7 +4,7 @@
     <decisionTable id="DecisionTable_1o5uapt">
       <input id="Input_1" label="Player O position">
         <inputExpression id="InputExpression_1" typeRef="string">
-          <text>field</text>
+          <text>random</text>
         </inputExpression>
       </input>
       <output id="Output_1" label="Computer X place" name="field" typeRef="string" />
