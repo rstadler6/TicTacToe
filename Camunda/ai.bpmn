@@ -124,7 +124,7 @@
       <bpmn:incoming>Flow_06vo95u</bpmn:incoming>
       <bpmn:outgoing>Flow_0uccbim</bpmn:outgoing>
     </bpmn:businessRuleTask>
-    <bpmn:scriptTask id="Activity_06bzww7" name="check for strat">
+    <bpmn:scriptTask id="Activity_06bzww7" name="check for strat" camunda:resultVariable="res">
       <bpmn:incoming>Flow_1wxdh24</bpmn:incoming>
       <bpmn:outgoing>Flow_1m055lt</bpmn:outgoing>
       <bpmn:script>var fieldState = execution.getVariable('fields')
@@ -139,9 +139,11 @@ const winCombos = [
     [2, 5, 8],
     [0, 4, 8],
     [6, 4, 2]
-]
+];
 
-function bestSpot();
+var response = (function() {
+    return bestSpot();
+})();  
 
 function checkWin(board, player) {
     let plays = board.reduce((a, e, i) =&gt;
