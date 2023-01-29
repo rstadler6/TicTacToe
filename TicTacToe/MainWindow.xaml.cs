@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using TicTacToeService;
 
 namespace TicTacToe
 {
@@ -20,6 +21,8 @@ namespace TicTacToe
         public MainWindow()
         {
             InitializeComponent();
+            TicTacToeService.TicTacToeService.RegisterMakeMoveAction(MakeMove);
+
             board = new [,]
             {
                 {button1, button2, button3},
@@ -165,6 +168,12 @@ namespace TicTacToe
             var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
             request.Content = new StringContent(ConvertGameState());
             client.Send(request);
+        }
+
+        private void MakeMove(int field)
+        {
+            board[(field - 1) / 3, (field - 1) % 3].Content = "X";
+            player1Turn = true;
         }
     }
 }
