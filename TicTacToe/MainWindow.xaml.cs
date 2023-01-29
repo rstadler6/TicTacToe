@@ -18,7 +18,8 @@ namespace TicTacToe
 {
     public partial class MainWindow : Window
     {
-        //private string[,] board = new string[3, 3];
+        private const string definition = "Process_0lg95ze:1:1141e060-a024-11ed-bf23-eeb27378f622";
+
         private readonly Button[,] board;
         private readonly HttpClient client = new();
         private bool player1Turn = true;
@@ -172,39 +173,46 @@ namespace TicTacToe
 
         private void StartBackend()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:8080/process-definition/key/ai/start");
-            client.Send(request);
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/process-definition/{definition}/start");
+            request.Content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+            var res = client.Send(request);
         }
 
         private async void SendStartingPlayer(string player)
         {
-            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, "http://localhost:8080/engine-rest/task?processDefinitionKey=ai");
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/engine-rest/task?processDefinitionId={definition}");
+            getTasksRequest.Headers.Add("accept", " application/json");
             var content = (await client.SendAsync(getTasksRequest)).Content;
-            var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
+            var task = JsonConvert.DeserializeObject<TaskResponse[]>(await content.ReadAsStringAsync());
 
             var rand = new Random();
-            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task[0].id}/complete");
             var json =
                 $@"
 {{
-  'variables': {{
-            'beginner': {{
-                'value': {player}
+  ""variables"": {{
+            ""beginner"": {{
+                ""value"": ""{player}""
             }},
-            'random': {{
-                'value': {rand.Next(1, 5)}
+            ""randomInt"": {{
+                ""value"": {rand.Next(1, 5)}
+            }},
+            ""move"": {{
+                ""value"": {aiMove}
             }}
         }},
-        'withVariablesInReturn': false
+        ""withVariablesInReturn"": true
 }}
 ";
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            await client.SendAsync(request);
+            var res = await client.SendAsync(request);
+
+            Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
 
         private async void SendToAI()
         {
-            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, "http://localhost:8080/engine-rest/task?processDefinitionKey=ai");
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/engine-rest/task?processDefinitionId={definition}");
             var content = (await client.SendAsync(getTasksRequest)).Content;
             var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
 
@@ -212,15 +220,15 @@ namespace TicTacToe
             var json =
                 $@"
 {{
-  'variables': {{
-            'fields': {{
-                'value': {ConvertGameState().ToCharArray()}
-            }}
-            'move': {{
-                'value': {aiMove}
+  ""variables"": {{
+            ""fields"": {{
+                ""value"": {ConvertGameState().ToCharArray()}
+            }},
+            ""move"": {{
+                ""value"": {aiMove}
             }}
         }},
-        'withVariablesInReturn': false
+        ""withVariablesInReturn"": true
 }}
 ";
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");

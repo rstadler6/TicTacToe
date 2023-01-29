@@ -109,8 +109,11 @@
         <camunda:connector>
           <camunda:inputOutput>
             <camunda:inputParameter name="method">POST</camunda:inputParameter>
-            <camunda:inputParameter name="payload">${field}</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:8080/update</camunda:inputParameter>
+            <camunda:inputParameter name="payload">{
+  "field": ${field},
+  "move": ${move}
+}</camunda:inputParameter>
+            <camunda:inputParameter name="url">https://localhost:7002/AI</camunda:inputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
