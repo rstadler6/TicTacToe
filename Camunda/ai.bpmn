@@ -88,11 +88,9 @@ const winCombos = [
     [2, 5, 8],
     [0, 4, 8],
     [6, 4, 2]
-];
+]
 
-var response = (function() {
-    return bestSpot();
-})();  
+function bestSpot();
 
 function checkWin(board, player) {
     let plays = board.reduce((a, e, i) =&gt;
@@ -249,9 +247,13 @@ function minimax(newBoard, player) {
         <dc:Bounds x="920" y="130" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0vswbd2_di" bpmnElement="Flow_0vswbd2">
-        <di:waypoint x="380" y="450" />
-        <di:waypoint x="380" y="305" />
+      <bpmndi:BPMNEdge id="Flow_1dnl4b4_di" bpmnElement="Flow_1dnl4b4">
+        <di:waypoint x="820" y="210" />
+        <di:waypoint x="820" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kevz7o_di" bpmnElement="Flow_1kevz7o">
+        <di:waypoint x="870" y="490" />
+        <di:waypoint x="945" y="490" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06p2elo_di" bpmnElement="Flow_06p2elo">
         <di:waypoint x="405" y="280" />
@@ -261,43 +263,19 @@ function minimax(newBoard, player) {
           <dc:Bounds x="457" y="262" width="32" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06vo95u_di" bpmnElement="Flow_06vo95u">
-        <di:waypoint x="380" y="255" />
-        <di:waypoint x="380" y="210" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="386" y="229" width="48" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06a3ddb_di" bpmnElement="Flow_06a3ddb">
         <di:waypoint x="590" y="490" />
         <di:waypoint x="615" y="490" />
         <di:waypoint x="615" y="280" />
         <di:waypoint x="640" y="280" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1o7q7rk_di" bpmnElement="Flow_1o7q7rk">
-        <di:waypoint x="690" y="240" />
-        <di:waypoint x="690" y="170" />
-        <di:waypoint x="770" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0uccbim_di" bpmnElement="Flow_0uccbim">
-        <di:waypoint x="430" y="170" />
-        <di:waypoint x="770" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1dnl4b4_di" bpmnElement="Flow_1dnl4b4">
-        <di:waypoint x="820" y="210" />
-        <di:waypoint x="820" y="450" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1m055lt_di" bpmnElement="Flow_1m055lt">
-        <di:waypoint x="920" y="170" />
-        <di:waypoint x="870" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1kevz7o_di" bpmnElement="Flow_1kevz7o">
-        <di:waypoint x="870" y="490" />
-        <di:waypoint x="945" y="490" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1oqk7aq_di" bpmnElement="Flow_1oqk7aq">
         <di:waypoint x="268" y="490" />
         <di:waypoint x="330" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vswbd2_di" bpmnElement="Flow_0vswbd2">
+        <di:waypoint x="380" y="450" />
+        <di:waypoint x="380" y="305" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15xkpr6_di" bpmnElement="Flow_15xkpr6">
         <di:waypoint x="995" y="490" />
@@ -309,6 +287,26 @@ function minimax(newBoard, player) {
       <bpmndi:BPMNEdge id="Flow_13yxsjm_di" bpmnElement="Flow_13yxsjm">
         <di:waypoint x="970" y="465" />
         <di:waypoint x="970" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o7q7rk_di" bpmnElement="Flow_1o7q7rk">
+        <di:waypoint x="690" y="240" />
+        <di:waypoint x="690" y="170" />
+        <di:waypoint x="770" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06vo95u_di" bpmnElement="Flow_06vo95u">
+        <di:waypoint x="380" y="255" />
+        <di:waypoint x="380" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="386" y="229" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uccbim_di" bpmnElement="Flow_0uccbim">
+        <di:waypoint x="430" y="170" />
+        <di:waypoint x="770" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1m055lt_di" bpmnElement="Flow_1m055lt">
+        <di:waypoint x="920" y="170" />
+        <di:waypoint x="870" y="170" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
