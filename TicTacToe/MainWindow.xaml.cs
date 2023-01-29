@@ -4,11 +4,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Newtonsoft.Json;
+
 namespace TicTacToe
 {
     public partial class MainWindow : Window
@@ -168,8 +173,14 @@ namespace TicTacToe
         private void SendToAI()
         {
             var request = new HttpRequestMessage(HttpMethod.Post, "http://google.ch");
-            request.Content = new StringContent(ConvertGameState());
+            var fieldState = new FieldState()
+            {
+                fields = ConvertGameState().ToCharArray()
+            };
+            var body = JsonConvert.SerializeObject(fieldState);
+            request.Content = new StringContent(body, Encoding.UTF8, "application/json");
             client.Send(request);
+
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
 
 
@@ -188,5 +199,11 @@ namespace TicTacToe
 
             FinishTurn();
         }
+
+    }
+
+    class FieldState
+    {
+        public char[] fields { get; set; }
     }
 }
