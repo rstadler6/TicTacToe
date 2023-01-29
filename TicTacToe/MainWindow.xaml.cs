@@ -48,7 +48,7 @@ namespace TicTacToe
             int row = Grid.GetRow(button);
             int col = Grid.GetColumn(button);
             
-            if ((string)button.Content != "")
+            if ((string)button.Content != string.Empty)
             {
                 MessageBox.Show("This cell is already occupied!");
                 return;
@@ -81,7 +81,7 @@ namespace TicTacToe
             // Check rows
             for (int i = 0; i < 3; i++)
             {
-                if (board[i, 0].Content == board[i, 1].Content && board[i, 1].Content == board[i, 2].Content && (string)board[i, 0].Content != "")
+                if (board[i, 0].Content == board[i, 1].Content && board[i, 1].Content == board[i, 2].Content && (string)board[i, 0].Content != string.Empty)
                 {
                     return true;
                 }
@@ -90,19 +90,19 @@ namespace TicTacToe
             // Check columns
             for (int i = 0; i < 3; i++)
             {
-                if (board[0, i].Content == board[1, i].Content && board[1, i].Content == board[2, i].Content && (string)board[0, i].Content != "")
+                if (board[0, i].Content == board[1, i].Content && board[1, i].Content == board[2, i].Content && (string)board[0, i].Content != string.Empty)
                 {
                     return true;
                 }
             }
 
             // Check diagonals
-            if (board[0, 0].Content == board[1, 1].Content && board[1, 1].Content == board[2, 2].Content && (string)board[0, 0].Content != "")
+            if (board[0, 0].Content == board[1, 1].Content && board[1, 1].Content == board[2, 2].Content && (string)board[0, 0].Content != string.Empty)
             {
                 return true;
             }
 
-            if (board[0, 2].Content == board[1, 1].Content && board[1, 1].Content == board[2, 0].Content && (string)board[0, 2].Content != "")
+            if (board[0, 2].Content == board[1, 1].Content && board[1, 1].Content == board[2, 0].Content && (string)board[0, 2].Content != string.Empty)
             {
                 return true;
             }
@@ -116,7 +116,7 @@ namespace TicTacToe
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if ((string)board[i, j].Content == "")
+                    if ((string)board[i, j].Content == string.Empty)
                     {
                         return false;
                     }
@@ -132,7 +132,7 @@ namespace TicTacToe
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    board[i, j].Content = "";
+                    board[i, j].Content = string.Empty;
                 }
             }
 
@@ -161,7 +161,8 @@ namespace TicTacToe
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    gameState += $"{board[i, j].Content},";
+                    var value = (string)board[i, j].Content != string.Empty ? board[i, j].Content : "_";
+                    gameState += $"{value},";
                 }
             }
 
@@ -181,6 +182,7 @@ namespace TicTacToe
             var content = (await client.SendAsync(getTasksRequest)).Content;
             var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
 
+            var rand = new Random();
             var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
             var json =
                 $@"
@@ -188,6 +190,9 @@ namespace TicTacToe
   'variables': {{
             'beginner': {{
                 'value': {player}
+            }},
+            'random': {{
+                'value': {rand.Next(1, 5)}
             }}
         }},
         'withVariablesInReturn': false
@@ -210,6 +215,9 @@ namespace TicTacToe
   'variables': {{
             'fields': {{
                 'value': {ConvertGameState().ToCharArray()}
+            }}
+            'move': {{
+                'value': {aiMove}
             }}
         }},
         'withVariablesInReturn': false
