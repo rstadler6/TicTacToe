@@ -88,92 +88,90 @@
     <bpmn:scriptTask id="Activity_06bzww7" name="place optimal X" scriptFormat="javascript" camunda:resultVariable="field">
       <bpmn:incoming>Flow_13yxsjm</bpmn:incoming>
       <bpmn:outgoing>Flow_1m055lt</bpmn:outgoing>
-      <bpmn:script>var fieldState = execution.getVariable('fieldsString').split(",");
-const huPlayer = 'O';
-const aiPlayer = 'X';
-const winCombos = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [6, 4, 2]
+      <bpmn:script>const winCombos = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
 ];
+
+var fieldState = execution.getVariable('fieldsString').split(",");
 
 execution.setVariable('field', bestSpot());
 
-function checkWin(board, player) {
-    let plays = board.reduce((a, e, i) =&gt;
-        (e === player) ? a.concat(i) : a, []);
-    let gameWon = null;
-    for (let [index, win] of winCombos.entries()) {
-        if (win.every(elem =&gt; plays.indexOf(elem) &gt; -1)) {
-            gameWon = { index: index, player: player };
-            break;
-        }
+function minimax(board, depth, player) {
+  let winner = checkWinner(board);
+  if (winner !== null) {
+    return winner === "X" ? 10 - depth : depth - 10;
+  }
+
+  if (depth === 0) {
+    return 0;
+  }
+
+  let bestScore = player === "X" ? -Infinity : Infinity;
+  for (let i = 0; i &lt; board.length; i++) {
+    if (board[i] === "_") {
+      let newBoard = board.slice();
+      newBoard[i] = player;
+
+      let score = minimax(newBoard, depth - 1, player === "X" ? "O" : "X");
+
+      if (player === "X") {
+        bestScore = Math.max(bestScore, score);
+      } else {
+        bestScore = Math.min(bestScore, score);
+      }
     }
-    return gameWon;
+  }
+
+  return bestScore;
 }
 
-function emptySquares() {
-    return fieldState.filter(s =&gt; s === '_');
+function checkWinner(board) {
+  for (let i = 0; i &lt; winCombos.length; i++) {
+    let [a, b, c] = winCombos[i];
+    if (
+      board[a] === board[b] &amp;&amp;
+      board[b] === board[c] &amp;&amp;
+      board[a] !== ""
+    ) {
+      return board[a];
+    }
+  }
+  return null;
 }
 
-function bestSpot() {
-    return minimax(fieldState, aiPlayer).index;
-}
+function findBestMove(board, player) {
+  let bestScore = player === "X" ? -Infinity : Infinity;
+  let bestMove = -1;
 
-function minimax(newBoard, player) {
-    var availSpots = emptySquares();
+  for (let i = 0; i &lt; board.length; i++) {
+    if (board[i] === "") {
+      let newBoard = board.slice();
+      newBoard[i] = player;
 
-    if (checkWin(newBoard, huPlayer)) {
-        return { score: -10 };
-    } else if (checkWin(newBoard, aiPlayer)) {
-        return { score: 10 };
-    } else if (availSpots.length === 0) {
-        return { score: 0 };
-    }
-    var moves = [];
-    for (var i = 0; i &lt; availSpots.length; i++) {
-        var move = {};
-        move.index = newBoard[availSpots[i]];
-        newBoard[availSpots[i]] = player;
+      let score = minimax(newBoard, 8, player === "X" ? "O" : "X");
 
-        if (player == aiPlayer) {
-            var result = minimax(newBoard, huPlayer);
-            move.score = result.score;
-        } else {
-            var result = minimax(newBoard, aiPlayer);
-            move.score = result.score;
+      if (player === "X") {
+        if (score &gt; bestScore) {
+          bestScore = score;
+          bestMove = i;
         }
-
-        newBoard[availSpots[i]] = move.index;
-
-        moves.push(move);
-    }
-
-    var bestMove;
-    if (player === aiPlayer) {
-        var bestScore = -10000;
-        for (var i = 0; i &lt; moves.length; i++) {
-            if (moves[i].score &gt; bestScore) {
-                bestScore = moves[i].score;
-                bestMove = i;
-            }
+      } else {
+        if (score &lt; bestScore) {
+          bestScore = score;
+          bestMove = i;
         }
-    } else {
-        var bestScore = 10000;
-        for (var i = 0; i &lt; moves.length; i++) {
-            if (moves[i].score &lt; bestScore) {
-                bestScore = moves[i].score;
-                bestMove = i;
-            }
-        }
+      }
     }
+  }
 
-    return moves[bestMove];
+  return bestMove;
 }</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:sequenceFlow id="Flow_1dnl4b4" sourceRef="Activity_0ok2em1" targetRef="Activity_0ca8v0m" />
@@ -305,11 +303,6 @@ function minimax(newBoard, player) {
           <dc:Bounds x="979" y="335" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1o7q7rk_di" bpmnElement="Flow_1o7q7rk">
-        <di:waypoint x="690" y="240" />
-        <di:waypoint x="690" y="170" />
-        <di:waypoint x="770" y="170" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06vo95u_di" bpmnElement="Flow_06vo95u">
         <di:waypoint x="380" y="255" />
         <di:waypoint x="380" y="210" />
@@ -324,6 +317,11 @@ function minimax(newBoard, player) {
       <bpmndi:BPMNEdge id="Flow_1m055lt_di" bpmnElement="Flow_1m055lt">
         <di:waypoint x="920" y="170" />
         <di:waypoint x="870" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o7q7rk_di" bpmnElement="Flow_1o7q7rk">
+        <di:waypoint x="690" y="240" />
+        <di:waypoint x="690" y="170" />
+        <di:waypoint x="770" y="170" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
