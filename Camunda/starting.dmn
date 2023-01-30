@@ -3,11 +3,11 @@
   <decision id="startField" name="Starting X">
     <decisionTable id="DecisionTable_17vnzvj">
       <input id="Input_1" label="Random Int">
-        <inputExpression id="InputExpression_1" typeRef="string">
+        <inputExpression id="InputExpression_1" typeRef="integer">
           <text>randomInt</text>
         </inputExpression>
       </input>
-      <output id="Output_1" label="Field" name="field" typeRef="string" biodi:width="192" />
+      <output id="Output_1" label="Field" name="field" typeRef="integer" biodi:width="192" />
       <rule id="DecisionRule_19pg1vt">
         <inputEntry id="UnaryTests_00atkhk">
           <text>1</text>

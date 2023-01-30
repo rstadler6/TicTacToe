@@ -21,6 +21,14 @@ namespace TicTacToeApi.Controllers
             file.Write(move.Field);
             file.Close();
         }
+        /*[HttpGet]
+        public void MakeMove(int field, int move)
+        {
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\TicTacToe\\Moves\\" + move;
+            var file = System.IO.File.CreateText(path);
+            file.Write(field);
+            file.Close();
+        }*/
     }
 
     public class MoveResponse

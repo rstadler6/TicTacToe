@@ -3,11 +3,11 @@
   <decision id="playerStartXplace" name="Player Start X placement">
     <decisionTable id="DecisionTable_1o5uapt">
       <input id="Input_1" label="Player O position">
-        <inputExpression id="InputExpression_1" typeRef="string">
+        <inputExpression id="InputExpression_1" typeRef="integer">
           <text>random</text>
         </inputExpression>
       </input>
-      <output id="Output_1" label="Computer X place" name="field" typeRef="string" />
+      <output id="Output_1" label="Computer X place" name="field" typeRef="integer" />
       <rule id="DecisionRule_1mvrhu9">
         <description>When placed in corner always place in middle</description>
         <inputEntry id="UnaryTests_0guztoy">

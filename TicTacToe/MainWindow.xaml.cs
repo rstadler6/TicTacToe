@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,7 +11,7 @@ namespace TicTacToe
 {
     public partial class MainWindow : Window
     {
-        private const string definition = "TicTacToe:1:022792bd-a027-11ed-abb8-eeb27378f622";
+        private const string definition = "TicTacToe:1:eca93bf8-a038-11ed-abb8-eeb27378f622";
 
         private readonly Button[,] board;
         private readonly HttpClient client = new();
@@ -191,6 +192,9 @@ namespace TicTacToe
             }},
             ""move"": {{
                 ""value"": {aiMove}
+            }},
+            ""winner"": {{
+                ""value"": false
             }}
         }},
         ""withVariablesInReturn"": true
@@ -202,29 +206,35 @@ namespace TicTacToe
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
 
-        private async void SendToAI()
+        private async void SendToAI(bool winner = false)
         {
             var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/engine-rest/task?processDefinitionId={definition}");
             var content = (await client.SendAsync(getTasksRequest)).Content;
-            var task = JsonConvert.DeserializeObject<TaskResponse>(await content.ReadAsStringAsync());
+            var task = JsonConvert.DeserializeObject<TaskResponse[]>(await content.ReadAsStringAsync());
 
-            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task.id}/resolve");
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task[0].id}/complete");
             var json =
                 $@"
 {{
   ""variables"": {{
             ""fields"": {{
-                ""value"": {ConvertGameState().ToCharArray()}
+                ""value"": {JsonConvert.SerializeObject(ConvertGameState().ToCharArray())}
+            }},
+            ""fieldsString"": {{
+                ""value"": ""{ConvertGameState()}""
             }},
             ""move"": {{
                 ""value"": {aiMove}
+            }},
+            ""winner"": {{
+                ""value"": {winner.ToString().ToLower()}
             }}
         }},
         ""withVariablesInReturn"": true
 }}
 ";
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            await client.SendAsync(request);
+            var res = await client.SendAsync(request);
 
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
