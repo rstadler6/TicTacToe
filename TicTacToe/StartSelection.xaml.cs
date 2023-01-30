@@ -34,10 +34,5 @@ namespace TicTacToe
         {
             DialogResult = true;
         }
-
-        private void StartSelection_OnClosing(object? sender, CancelEventArgs e)
-        {
-            DialogResult = false;
-        }
     }
 }

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_156xlgd" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.7.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.18.0">
   <decision id="playerStartXplace" name="Player Start X placement">
-    <decisionTable id="DecisionTable_1o5uapt">
+    <decisionTable id="DecisionTable_1o5uapt" hitPolicy="FIRST">
       <input id="Input_1" label="Player O position">
-        <inputExpression id="InputExpression_1" typeRef="integer">
-          <text>random</text>
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>fieldsString</text>
         </inputExpression>
       </input>
       <output id="Output_1" label="Computer X place" name="field" typeRef="integer" />
       <rule id="DecisionRule_1mvrhu9">
         <description>When placed in corner always place in middle</description>
         <inputEntry id="UnaryTests_0guztoy">
-          <text>1</text>
+          <text>"O,_,_,_,_,_,_,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_194shvz">
           <text>5</text>
@@ -20,7 +20,7 @@
       <rule id="DecisionRule_18njkp9">
         <description></description>
         <inputEntry id="UnaryTests_0gpa4s1">
-          <text>3</text>
+          <text>"_,_,O,_,_,_,_,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0tuvj3y">
           <text>5</text>
@@ -29,7 +29,7 @@
       <rule id="DecisionRule_0la0s1f">
         <description></description>
         <inputEntry id="UnaryTests_0gbyrte">
-          <text>7</text>
+          <text>"_,_,_,_,_,_,O,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0q3l9hq">
           <text>5</text>
@@ -38,7 +38,7 @@
       <rule id="DecisionRule_0b6voo4">
         <description></description>
         <inputEntry id="UnaryTests_0bpdh78">
-          <text>9</text>
+          <text>"_,_,_,_,_,_,_,_,O"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0sva9wl">
           <text>5</text>
@@ -47,7 +47,7 @@
       <rule id="DecisionRule_0slmcef">
         <description>When your opponent starts by putting down an O in the center, place your first X in a corner</description>
         <inputEntry id="UnaryTests_0xpdk8f">
-          <text>5</text>
+          <text>"_,_,_,_,O,_,_,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0fp1mg5">
           <text>1</text>
@@ -56,7 +56,7 @@
       <rule id="DecisionRule_0pgpejy">
         <description></description>
         <inputEntry id="UnaryTests_0k87aoh">
-          <text>2</text>
+          <text>"_,O,_,_,_,_,_,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_1ab4scc">
           <text>5</text>
@@ -64,7 +64,7 @@
       </rule>
       <rule id="DecisionRule_0vo9c3l">
         <inputEntry id="UnaryTests_04cvx47">
-          <text>4</text>
+          <text>"_,_,_,O,_,_,_,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0giydhe">
           <text>5</text>
@@ -72,7 +72,7 @@
       </rule>
       <rule id="DecisionRule_0ua73oc">
         <inputEntry id="UnaryTests_0xyd73f">
-          <text>6</text>
+          <text>"_,_,_,_,_,O,_,_,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_0uthpyp">
           <text>5</text>
@@ -80,7 +80,7 @@
       </rule>
       <rule id="DecisionRule_1pgt5hk">
         <inputEntry id="UnaryTests_01tg8nt">
-          <text>8</text>
+          <text>"_,_,_,_,_,_,_,O,_"</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_1f6sksw">
           <text>5</text>

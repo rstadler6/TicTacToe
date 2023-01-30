@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +12,7 @@ namespace TicTacToe
 {
     public partial class MainWindow : Window
     {
-        private const string definition = "TicTacToe:1:eca93bf8-a038-11ed-abb8-eeb27378f622";
+        private const string definition = "TicTacToe:1:97a8dc46-a04f-11ed-abb8-eeb27378f622";
 
         private readonly Button[,] board;
         private readonly HttpClient client = new();
@@ -51,23 +52,25 @@ namespace TicTacToe
             button.Content = "O";
 
             SendToAI();
-            FinishTurn();
+            SendWinCheck(FinishTurn());
         }
 
-        private void FinishTurn()
+        private bool FinishTurn()
         {
             player1Turn = !player1Turn;
 
             if (IsWin())
             {
                 MessageBox.Show("Player " + (player1Turn ? "2" : "1") + " wins!");
-                ResetGame();
+                return true;
             }
             else if (IsDraw())
             {
                 MessageBox.Show("It's a draw!");
-                ResetGame();
+                return true;
             }
+
+            return false;
         }
 
         private bool IsWin()
@@ -135,7 +138,9 @@ namespace TicTacToe
             StartBackend();
             
             var startSelection = new StartSelection();
-            if (startSelection.ShowDialog() == false)
+            startSelection.ShowDialog();
+
+            if (startSelection.DialogResult == false)
             {
                 SendStartingPlayer("computer");
                 player1Turn = false;
@@ -206,7 +211,7 @@ namespace TicTacToe
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
 
-        private async void SendToAI(bool winner = false)
+        private async void SendToAI()
         {
             var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/engine-rest/task?processDefinitionId={definition}");
             var content = (await client.SendAsync(getTasksRequest)).Content;
@@ -221,13 +226,13 @@ namespace TicTacToe
                 ""value"": {JsonConvert.SerializeObject(ConvertGameState().ToCharArray())}
             }},
             ""fieldsString"": {{
-                ""value"": ""{ConvertGameState()}""
+                ""value"": ""{ConvertGameState().TrimEnd(',')}""
             }},
             ""move"": {{
                 ""value"": {aiMove}
             }},
             ""winner"": {{
-                ""value"": {winner.ToString().ToLower()}
+                ""value"": false
             }}
         }},
         ""withVariablesInReturn"": true
@@ -239,12 +244,43 @@ namespace TicTacToe
             Task.Run(() => TicTacToeService.StartLoop(aiMove++));
         }
 
+        private async void SendWinCheck(bool winner)
+        {
+            var ge0tTasksRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/engine-rest/task?processDefinitionId={definition}");
+            var co0ntent = (await client.SendAsync(ge0tTasksRequest)).Content;
+            var ta0sk = JsonConvert.DeserializeObject<TaskResponse[]>(await co0ntent.ReadAsStringAsync());
+            Thread.Sleep(100);
+            var getTasksRequest = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:8080/engine-rest/task?processDefinitionId={definition}");
+            var content = (await client.SendAsync(getTasksRequest)).Content;
+            var task = JsonConvert.DeserializeObject<TaskResponse[]>(await content.ReadAsStringAsync());
+
+            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:8080/engine-rest/task/{task[0].id}/complete");
+            var json =
+                $@"
+{{
+  ""variables"": {{
+            ""winner"": {{
+                ""value"": {winner.ToString().ToLower()}
+            }}
+        }},
+        ""withVariablesInReturn"": true
+}}
+";
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            var res = await client.SendAsync(request);
+
+            if (winner)
+            {
+                //ResetGame();
+            }
+        }
+
         private void MakeMove(int field)
         {
             Dispatcher.Invoke(() =>
             {
                 board[(field - 1) / 3, (field - 1) % 3].Content = "X";
-                FinishTurn();
+                SendWinCheck(FinishTurn());
             });
         }
 

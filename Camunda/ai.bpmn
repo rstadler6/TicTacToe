@@ -5,14 +5,6 @@
   </bpmn:collaboration>
   <bpmn:process id="TicTacToe" isExecutable="true">
     <bpmn:laneSet id="LaneSet_1p2la25">
-      <bpmn:lane id="Lane_0hgyvjs" name="Player">
-        <bpmn:flowNodeRef>Activity_0ca8v0m</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1nl4iwl</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_046vcpl</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_0x93b3x</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0p0234p</bpmn:flowNodeRef>
-      </bpmn:lane>
       <bpmn:lane id="Lane_1czsko7" name="Computer">
         <bpmn:flowNodeRef>Activity_04ktrdd</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0n4no3t</bpmn:flowNodeRef>
@@ -20,11 +12,19 @@
         <bpmn:flowNodeRef>Activity_1556k1m</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_06bzww7</bpmn:flowNodeRef>
       </bpmn:lane>
+      <bpmn:lane id="Lane_0hgyvjs" name="Player">
+        <bpmn:flowNodeRef>Activity_1nl4iwl</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_046vcpl</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0ca8v0m</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1dp31lx</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0x93b3x</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0p0234p</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1g3pptx</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0rcoa63</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1n7orir</bpmn:flowNodeRef>
+      </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:userTask id="Activity_0ca8v0m" name="place O">
-      <bpmn:incoming>Flow_1dnl4b4</bpmn:incoming>
-      <bpmn:outgoing>Flow_1kevz7o</bpmn:outgoing>
-    </bpmn:userTask>
     <bpmn:userTask id="Activity_1nl4iwl" name="place O">
       <bpmn:incoming>Flow_06p2elo</bpmn:incoming>
       <bpmn:outgoing>Flow_06a3ddb</bpmn:outgoing>
@@ -36,16 +36,8 @@
     <bpmn:startEvent id="StartEvent_1" name="start application">
       <bpmn:outgoing>Flow_1oqk7aq</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:exclusiveGateway id="Gateway_0x93b3x" name="winner?">
-      <bpmn:incoming>Flow_1kevz7o</bpmn:incoming>
-      <bpmn:outgoing>Flow_15xkpr6</bpmn:outgoing>
-      <bpmn:outgoing>Flow_13yxsjm</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:endEvent id="Event_0p0234p" name="end game">
-      <bpmn:incoming>Flow_15xkpr6</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:businessRuleTask id="Activity_04ktrdd" name="first X strat" camunda:resultVariable="field" camunda:decisionRef="playerStartXplace" camunda:mapDecisionResult="singleEntry">
-      <bpmn:incoming>Flow_06a3ddb</bpmn:incoming>
+      <bpmn:incoming>Flow_1y59kiw</bpmn:incoming>
       <bpmn:outgoing>Flow_1o7q7rk</bpmn:outgoing>
     </bpmn:businessRuleTask>
     <bpmn:exclusiveGateway id="Gateway_0n4no3t" name="beginner">
@@ -85,101 +77,12 @@
       <bpmn:incoming>Flow_06vo95u</bpmn:incoming>
       <bpmn:outgoing>Flow_0uccbim</bpmn:outgoing>
     </bpmn:businessRuleTask>
-    <bpmn:scriptTask id="Activity_06bzww7" name="place optimal X" scriptFormat="javascript" camunda:resultVariable="field">
-      <bpmn:incoming>Flow_13yxsjm</bpmn:incoming>
-      <bpmn:outgoing>Flow_1m055lt</bpmn:outgoing>
-      <bpmn:script>const winCombos = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6]
-];
-
-var fieldState = execution.getVariable('fieldsString').split(",");
-
-execution.setVariable('field', bestSpot());
-
-function minimax(board, depth, player) {
-  let winner = checkWinner(board);
-  if (winner !== null) {
-    return winner === "X" ? 10 - depth : depth - 10;
-  }
-
-  if (depth === 0) {
-    return 0;
-  }
-
-  let bestScore = player === "X" ? -Infinity : Infinity;
-  for (let i = 0; i &lt; board.length; i++) {
-    if (board[i] === "_") {
-      let newBoard = board.slice();
-      newBoard[i] = player;
-
-      let score = minimax(newBoard, depth - 1, player === "X" ? "O" : "X");
-
-      if (player === "X") {
-        bestScore = Math.max(bestScore, score);
-      } else {
-        bestScore = Math.min(bestScore, score);
-      }
-    }
-  }
-
-  return bestScore;
-}
-
-function checkWinner(board) {
-  for (let i = 0; i &lt; winCombos.length; i++) {
-    let [a, b, c] = winCombos[i];
-    if (
-      board[a] === board[b] &amp;&amp;
-      board[b] === board[c] &amp;&amp;
-      board[a] !== ""
-    ) {
-      return board[a];
-    }
-  }
-  return null;
-}
-
-function findBestMove(board, player) {
-  let bestScore = player === "X" ? -Infinity : Infinity;
-  let bestMove = -1;
-
-  for (let i = 0; i &lt; board.length; i++) {
-    if (board[i] === "") {
-      let newBoard = board.slice();
-      newBoard[i] = player;
-
-      let score = minimax(newBoard, 8, player === "X" ? "O" : "X");
-
-      if (player === "X") {
-        if (score &gt; bestScore) {
-          bestScore = score;
-          bestMove = i;
-        }
-      } else {
-        if (score &lt; bestScore) {
-          bestScore = score;
-          bestMove = i;
-        }
-      }
-    }
-  }
-
-  return bestMove;
-}</bpmn:script>
-    </bpmn:scriptTask>
-    <bpmn:sequenceFlow id="Flow_1dnl4b4" sourceRef="Activity_0ok2em1" targetRef="Activity_0ca8v0m" />
-    <bpmn:sequenceFlow id="Flow_1kevz7o" sourceRef="Activity_0ca8v0m" targetRef="Gateway_0x93b3x" />
+    <bpmn:sequenceFlow id="Flow_1dnl4b4" sourceRef="Activity_0ok2em1" targetRef="Activity_0rcoa63" />
+    <bpmn:sequenceFlow id="Flow_1kevz7o" sourceRef="Activity_0ca8v0m" targetRef="Activity_1g3pptx" />
     <bpmn:sequenceFlow id="Flow_06p2elo" name="player" sourceRef="Gateway_0n4no3t" targetRef="Activity_1nl4iwl">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${beginner == "player"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_06a3ddb" sourceRef="Activity_1nl4iwl" targetRef="Activity_04ktrdd" />
+    <bpmn:sequenceFlow id="Flow_06a3ddb" sourceRef="Activity_1nl4iwl" targetRef="Activity_1n7orir" />
     <bpmn:sequenceFlow id="Flow_1oqk7aq" sourceRef="StartEvent_1" targetRef="Activity_046vcpl" />
     <bpmn:sequenceFlow id="Flow_0vswbd2" sourceRef="Activity_046vcpl" targetRef="Gateway_0n4no3t" />
     <bpmn:sequenceFlow id="Flow_15xkpr6" name="yes" sourceRef="Gateway_0x93b3x" targetRef="Event_0p0234p">
@@ -188,140 +91,388 @@ function findBestMove(board, player) {
     <bpmn:sequenceFlow id="Flow_13yxsjm" name="no" sourceRef="Gateway_0x93b3x" targetRef="Activity_06bzww7">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!winner}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1o7q7rk" sourceRef="Activity_04ktrdd" targetRef="Activity_0ok2em1" />
     <bpmn:sequenceFlow id="Flow_06vo95u" name="computer" sourceRef="Gateway_0n4no3t" targetRef="Activity_1556k1m">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${beginner == "computer"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0uccbim" sourceRef="Activity_1556k1m" targetRef="Activity_0ok2em1" />
     <bpmn:sequenceFlow id="Flow_1m055lt" sourceRef="Activity_06bzww7" targetRef="Activity_0ok2em1" />
-    <bpmn:sequenceFlow id="Flow_1o7q7rk" sourceRef="Activity_04ktrdd" targetRef="Activity_0ok2em1" />
+    <bpmn:scriptTask id="Activity_06bzww7" name="place optimal X" scriptFormat="javascript" camunda:resultVariable="field">
+      <bpmn:incoming>Flow_13yxsjm</bpmn:incoming>
+      <bpmn:outgoing>Flow_1m055lt</bpmn:outgoing>
+      <bpmn:script>const winCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+  const player = "O";
+  const ai = "X";
+
+  var fieldState = execution.getVariable('fieldsString').split(",");
+  var bestMove = getWinningPreventingMove(fieldState);
+  
+  if (bestMove === -1) {
+    bestMove = findBestMove(fieldState, "X");
+  }
+  
+  execution.setVariable('field', bestMove);
+  
+  function getWinningPreventingMove(fieldState) {
+    var bestMove = -1;
+    var winningMoves = [];
+    var preventingMoves = [];
+  
+    for (let index = 0; index &lt; fieldState.length; index++) {
+      if (fieldState[index] === "_") {
+        winCombos.forEach((win) =&gt; {
+          if (win.some((i) =&gt; i === index)) {
+            var playerCount = 0;
+            var aiCount = 0;
+  
+            win.forEach((winPos) =&gt; {
+              if (fieldState[winPos] === player) {
+                playerCount++;
+              } else if (fieldState[winPos] === ai) {
+                aiCount++;
+              }
+            });
+  
+            if (aiCount === 2) {
+                winningMoves.push(win);
+            } else if (playerCount === 2) {
+                preventingMoves.push(win);
+              index = 9;
+            }
+          }
+        });
+      }
+    }
+  
+    if (winningMoves.length &gt; 0) {
+      winningMoves[0].forEach((winPos) =&gt; {
+        if (fieldState[winPos] !== ai) {
+            bestMove = winPos + 1;
+        }
+      });
+    } else if (preventingMoves.length &gt; 0) {
+      preventingMoves[0].forEach((winPos) =&gt; {
+        console.log(fieldState[winPos]);
+        console.log(fieldState[winPos] !== player);
+        if (fieldState[winPos] !== player) {
+            bestMove = winPos + 1;
+        }
+      });
+    }
+
+    if (bestMove === -1) {
+        if (fieldState[0] === "_") {
+            bestMove = 1;
+        } else if (fieldState[2] === "_") {
+            bestMove = 3;
+        } else if (fieldState[6] === "_") {
+            bestMove = 7;
+        } else if (fieldState[8] === "_") {
+            bestMove = 9;
+        } else if (fieldState[4] === "_") {
+            bestMove = 5;
+        } else if (fieldState[1] === "_") {
+            bestMove = 2;
+        } else if (fieldState[3] === "_") {
+            bestMove = 4;
+        } else if (fieldState[5] === "_") {
+            bestMove = 6;
+        } else if (fieldState[7] === "_") {
+            bestMove = 8;
+        }
+    }
+
+    return bestMove;
+  }
+  
+  function minimax(board, depth, player) {
+    let winner = checkWinner(board);
+    if (winner !== null) {
+      return winner === "X" ? 10 - depth : depth - 10;
+    }
+  
+    if (depth === 0) {
+      return 0;
+    }
+  
+    let bestScore = player === "X" ? -Infinity : Infinity;
+    for (let i = 0; i &lt; board.length; i++) {
+      if (board[i] === "_") {
+        let newBoard = board.slice();
+        newBoard[i] = player;
+  
+        let score = minimax(newBoard, depth - 1, player === "X" ? "O" : "X");
+  
+        if (player === "X") {
+          bestScore = Math.max(bestScore, score);
+        } else {
+          bestScore = Math.min(bestScore, score);
+        }
+      }
+    }
+  
+    return bestScore;
+  }
+  
+  function checkWinner(board) {
+    for (let i = 0; i &lt; winCombos.length; i++) {
+      let [a, b, c] = winCombos[i];
+      if (board[a] === board[b] &amp;&amp; board[b] === board[c] &amp;&amp; board[a] !== "") {
+        return board[a];
+      }
+    }
+    return null;
+  }
+  
+  function findBestMove(board, player) {
+    let bestScore = player === "X" ? -Infinity : Infinity;
+    let bestMove = -1;
+  
+    for (let i = 0; i &lt; board.length; i++) {
+      if (board[i] === "") {
+        let newBoard = board.slice();
+        newBoard[i] = player;
+  
+        let score = minimax(newBoard, 8, player === "X" ? "O" : "X");
+  
+        if (player === "X") {
+          if (score &gt; bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        } else {
+          if (score &lt; bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+    }
+  
+    return bestMove;
+  }
+  </bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1vngegv" sourceRef="Activity_1g3pptx" targetRef="Gateway_0x93b3x" />
+    <bpmn:userTask id="Activity_0ca8v0m" name="place O">
+      <bpmn:incoming>Flow_10lca61</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kevz7o</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1dp31lx" name="winner?">
+      <bpmn:incoming>Flow_1vyizud</bpmn:incoming>
+      <bpmn:outgoing>Flow_10lca61</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1bl0e7h</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1vyizud" sourceRef="Activity_0rcoa63" targetRef="Gateway_1dp31lx" />
+    <bpmn:sequenceFlow id="Flow_10lca61" name="no" sourceRef="Gateway_1dp31lx" targetRef="Activity_0ca8v0m">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!winner}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:exclusiveGateway id="Gateway_0x93b3x" name="winner?">
+      <bpmn:incoming>Flow_1vngegv</bpmn:incoming>
+      <bpmn:outgoing>Flow_15xkpr6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_13yxsjm</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1bl0e7h" name="yes" sourceRef="Gateway_1dp31lx" targetRef="Event_0p0234p">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${winner}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_0p0234p" name="end game">
+      <bpmn:incoming>Flow_15xkpr6</bpmn:incoming>
+      <bpmn:incoming>Flow_1bl0e7h</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Activity_1g3pptx" name="win check">
+      <bpmn:incoming>Flow_1kevz7o</bpmn:incoming>
+      <bpmn:outgoing>Flow_1vngegv</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Activity_0rcoa63" name="win check">
+      <bpmn:incoming>Flow_1dnl4b4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1vyizud</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1y59kiw" sourceRef="Activity_1n7orir" targetRef="Activity_04ktrdd" />
+    <bpmn:userTask id="Activity_1n7orir" name="win check">
+      <bpmn:incoming>Flow_06a3ddb</bpmn:incoming>
+      <bpmn:outgoing>Flow_1y59kiw</bpmn:outgoing>
+    </bpmn:userTask>
   </bpmn:process>
   <bpmn:message id="Message_3if65mr" name="Message_3if65mr" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_079bhlj">
       <bpmndi:BPMNShape id="Participant_16ce314_di" bpmnElement="Participant_16ce314" isHorizontal="true">
-        <dc:Bounds x="129" y="80" width="1121" height="500" />
+        <dc:Bounds x="154" y="80" width="1306" height="660" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_1czsko7_di" bpmnElement="Lane_1czsko7" isHorizontal="true">
-        <dc:Bounds x="159" y="80" width="1091" height="270" />
+        <dc:Bounds x="184" y="80" width="1276" height="270" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_0hgyvjs_di" bpmnElement="Lane_0hgyvjs" isHorizontal="true">
-        <dc:Bounds x="159" y="350" width="1091" height="230" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_10gczwe_di" bpmnElement="Activity_0ca8v0m">
-        <dc:Bounds x="770" y="450" width="100" height="80" />
+        <dc:Bounds x="184" y="350" width="1276" height="390" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0gikodz_di" bpmnElement="Activity_1nl4iwl">
-        <dc:Bounds x="490" y="450" width="100" height="80" />
+        <dc:Bounds x="515" y="450" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1933hqb_di" bpmnElement="Activity_046vcpl">
-        <dc:Bounds x="330" y="450" width="100" height="80" />
+        <dc:Bounds x="355" y="450" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="232" y="472" width="36" height="36" />
+        <dc:Bounds x="257" y="472" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="211" y="515" width="78" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0x93b3x_di" bpmnElement="Gateway_0x93b3x" isMarkerVisible="true">
-        <dc:Bounds x="945" y="465" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="951" y="522" width="38" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0p0234p_di" bpmnElement="Event_0p0234p">
-        <dc:Bounds x="1122" y="472" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1116" y="515" width="49" height="14" />
+          <dc:Bounds x="236" y="515" width="78" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_03j0lzd_di" bpmnElement="Activity_04ktrdd">
-        <dc:Bounds x="640" y="240" width="100" height="80" />
+        <dc:Bounds x="665" y="240" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0n4no3t_di" bpmnElement="Gateway_0n4no3t" isMarkerVisible="true">
-        <dc:Bounds x="355" y="255" width="50" height="50" />
+        <dc:Bounds x="380" y="255" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="297" y="273" width="45" height="14" />
+          <dc:Bounds x="322" y="273" width="45" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_12v6hph_di" bpmnElement="Activity_0ok2em1">
-        <dc:Bounds x="770" y="130" width="100" height="80" />
+        <dc:Bounds x="795" y="130" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1jf9t7h_di" bpmnElement="Activity_1556k1m">
-        <dc:Bounds x="330" y="130" width="100" height="80" />
+        <dc:Bounds x="355" y="130" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0r2s52i_di" bpmnElement="Activity_06bzww7">
-        <dc:Bounds x="920" y="130" width="100" height="80" />
+        <dc:Bounds x="1060" y="130" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_10gczwe_di" bpmnElement="Activity_0ca8v0m">
+        <dc:Bounds x="795" y="600" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1s378kt" bpmnElement="Gateway_1dp31lx" isMarkerVisible="true">
+        <dc:Bounds x="820" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="772" y="523" width="38" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0x93b3x_di" bpmnElement="Gateway_0x93b3x" isMarkerVisible="true">
+        <dc:Bounds x="1085" y="505" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1145" y="523" width="38" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0p0234p_di" bpmnElement="Event_0p0234p">
+        <dc:Bounds x="962" y="512" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="956" y="555" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_03jhmig" bpmnElement="Activity_1g3pptx">
+        <dc:Bounds x="1060" y="600" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0bd31zr" bpmnElement="Activity_0rcoa63">
+        <dc:Bounds x="795" y="380" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0ly2wld" bpmnElement="Activity_1n7orir">
+        <dc:Bounds x="590" y="360" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1dnl4b4_di" bpmnElement="Flow_1dnl4b4">
-        <di:waypoint x="820" y="210" />
-        <di:waypoint x="820" y="450" />
+        <di:waypoint x="845" y="210" />
+        <di:waypoint x="845" y="380" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1kevz7o_di" bpmnElement="Flow_1kevz7o">
-        <di:waypoint x="870" y="490" />
-        <di:waypoint x="945" y="490" />
+        <di:waypoint x="895" y="640" />
+        <di:waypoint x="1060" y="640" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06p2elo_di" bpmnElement="Flow_06p2elo">
-        <di:waypoint x="405" y="280" />
-        <di:waypoint x="540" y="280" />
-        <di:waypoint x="540" y="450" />
+        <di:waypoint x="430" y="280" />
+        <di:waypoint x="565" y="280" />
+        <di:waypoint x="565" y="450" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="457" y="262" width="32" height="14" />
+          <dc:Bounds x="482" y="262" width="32" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06a3ddb_di" bpmnElement="Flow_06a3ddb">
-        <di:waypoint x="590" y="490" />
         <di:waypoint x="615" y="490" />
-        <di:waypoint x="615" y="280" />
-        <di:waypoint x="640" y="280" />
+        <di:waypoint x="640" y="490" />
+        <di:waypoint x="640" y="440" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1oqk7aq_di" bpmnElement="Flow_1oqk7aq">
-        <di:waypoint x="268" y="490" />
-        <di:waypoint x="330" y="490" />
+        <di:waypoint x="293" y="490" />
+        <di:waypoint x="355" y="490" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0vswbd2_di" bpmnElement="Flow_0vswbd2">
-        <di:waypoint x="380" y="450" />
-        <di:waypoint x="380" y="305" />
+        <di:waypoint x="405" y="450" />
+        <di:waypoint x="405" y="305" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15xkpr6_di" bpmnElement="Flow_15xkpr6">
-        <di:waypoint x="995" y="490" />
-        <di:waypoint x="1122" y="490" />
+        <di:waypoint x="1085" y="530" />
+        <di:waypoint x="998" y="530" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1050" y="472" width="17" height="14" />
+          <dc:Bounds x="1032" y="513" width="17" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_13yxsjm_di" bpmnElement="Flow_13yxsjm">
-        <di:waypoint x="970" y="465" />
-        <di:waypoint x="970" y="210" />
+        <di:waypoint x="1110" y="505" />
+        <di:waypoint x="1110" y="210" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="979" y="335" width="13" height="14" />
+          <dc:Bounds x="1119" y="357" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o7q7rk_di" bpmnElement="Flow_1o7q7rk">
+        <di:waypoint x="715" y="240" />
+        <di:waypoint x="715" y="170" />
+        <di:waypoint x="795" y="170" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_06vo95u_di" bpmnElement="Flow_06vo95u">
-        <di:waypoint x="380" y="255" />
-        <di:waypoint x="380" y="210" />
+        <di:waypoint x="405" y="255" />
+        <di:waypoint x="405" y="210" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="386" y="229" width="48" height="14" />
+          <dc:Bounds x="411" y="229" width="48" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0uccbim_di" bpmnElement="Flow_0uccbim">
-        <di:waypoint x="430" y="170" />
-        <di:waypoint x="770" y="170" />
+        <di:waypoint x="455" y="170" />
+        <di:waypoint x="795" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1m055lt_di" bpmnElement="Flow_1m055lt">
-        <di:waypoint x="920" y="170" />
-        <di:waypoint x="870" y="170" />
+        <di:waypoint x="1060" y="170" />
+        <di:waypoint x="895" y="170" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1o7q7rk_di" bpmnElement="Flow_1o7q7rk">
-        <di:waypoint x="690" y="240" />
-        <di:waypoint x="690" y="170" />
-        <di:waypoint x="770" y="170" />
+      <bpmndi:BPMNEdge id="Flow_1vngegv_di" bpmnElement="Flow_1vngegv">
+        <di:waypoint x="1110" y="600" />
+        <di:waypoint x="1110" y="555" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vyizud_di" bpmnElement="Flow_1vyizud">
+        <di:waypoint x="845" y="460" />
+        <di:waypoint x="845" y="505" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10lca61_di" bpmnElement="Flow_10lca61">
+        <di:waypoint x="845" y="555" />
+        <di:waypoint x="845" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="854" y="575" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bl0e7h_di" bpmnElement="Flow_1bl0e7h">
+        <di:waypoint x="870" y="530" />
+        <di:waypoint x="962" y="530" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="908" y="512" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1y59kiw_di" bpmnElement="Flow_1y59kiw">
+        <di:waypoint x="640" y="360" />
+        <di:waypoint x="640" y="280" />
+        <di:waypoint x="665" y="280" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
